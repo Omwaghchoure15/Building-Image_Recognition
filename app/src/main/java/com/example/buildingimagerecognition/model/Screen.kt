@@ -5,8 +5,6 @@ sealed class Screen(val route: String) {
     object Camera : Screen("camera/{from}") {
         fun create(from: String) = "camera/$from"
     }
-    object Gallery : Screen("gallery")
     object Result : Screen("result")
     object AddBuilding : Screen("addBuilding")
 }
-

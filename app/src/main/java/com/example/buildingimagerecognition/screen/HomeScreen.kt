@@ -17,8 +17,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeScreen(
-    onScanClick: () -> Unit,
-    onGalleryClick: () -> Unit
+    onScanClick: () -> Unit
 ) {
     Scaffold { padding ->
         Column(
@@ -52,19 +51,6 @@ fun HomeScreen(
             ) {
                 Text(
                     text = "Scan Building",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = onGalleryClick,
-                modifier = Modifier
-                    .height(52.dp)
-            ) {
-                Text(
-                    text = "Select from Gallery",
                     style = MaterialTheme.typography.titleMedium
                 )
             }

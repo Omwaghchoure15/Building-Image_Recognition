@@ -5,16 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.buildingimagerecognition.screen.AddBuildingScreen
 import com.example.buildingimagerecognition.screen.CameraScreen
 import com.example.buildingimagerecognition.screen.HomeScreen
 import com.example.buildingimagerecognition.screen.ResultScreen
-import com.example.buildingimagerecognition.screen.GalleryScreen
 
 @Composable
 fun AppNavHost(
@@ -31,9 +28,6 @@ fun AppNavHost(
                     cameraSource = CameraSource.SCAN
                     navController.navigate(Screen.Camera.create("home"))
                 },
-                onGalleryClick = {
-                    navController.navigate(Screen.Gallery.route)
-                }
             )
         }
         composable(Screen.Camera.route) {
@@ -54,21 +48,6 @@ fun AppNavHost(
                     }
                 }
             }
-        }
-
-        composable(Screen.Gallery.route) {
-            GalleryScreen(
-                onImageSelected = { bitmap, imagePath ->
-                    viewModel.setCapturedImage(imagePath)
-                    viewModel.processCapturedImage(bitmap)
-                    navController.navigate(Screen.Result.route) {
-                        popUpTo(Screen.Gallery.route) { inclusive = true }
-                    }
-                },
-                onCancel = {
-                    navController.popBackStack()
-                }
-            )
         }
 
         composable(Screen.Result.route) {

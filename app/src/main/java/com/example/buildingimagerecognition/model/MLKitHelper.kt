@@ -11,7 +11,6 @@ object MLKitHelper {
         "architecture",
         "structure"
     )
-
     fun labelImage(
         bitmap: Bitmap,
         onResult: (List<String>) -> Unit
@@ -21,7 +20,6 @@ object MLKitHelper {
         val labeler = ImageLabeling.getClient(
             ImageLabelerOptions.DEFAULT_OPTIONS
         )
-
         labeler.process(image)
             .addOnSuccessListener { labels ->
                 val result = labels

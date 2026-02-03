@@ -4,10 +4,6 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Database(
     entities = [BuildingEntity::class],
@@ -22,31 +18,12 @@ abstract class AppDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this) {
                 Room.databaseBuilder(
                     context.applicationContext,
-                    AppDatabase::class.java,
-                    "building_db"
+                    klass = AppDatabase::class.java,
+                    name = "building_db"
                 )
-                    .fallbackToDestructiveMigration()
-                    .addCallback(object : Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            prepopulate(context)
-                        }
-                    })
+                    .fallbackToDestructiveMigration(false)
                     .build()
                     .also { INSTANCE = it }
-            }
-        }
-
-        private fun prepopulate(context: Context) {
-            CoroutineScope(Dispatchers.IO).launch {
-                getDatabase(context).buildingDao().insertBuilding(
-                    BuildingEntity(
-                        name = "Abhyudaya Building",
-                        location = "Mumbai",
-                        labels = "building,architecture",
-                        imagePaths = "drawable:img_1,drawable:img_2"
-                    )
-                )
             }
         }
     }
