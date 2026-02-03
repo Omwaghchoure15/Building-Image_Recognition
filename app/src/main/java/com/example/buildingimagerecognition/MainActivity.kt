@@ -2,6 +2,7 @@ package com.example.buildingimagerecognition
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,17 +15,30 @@ import com.example.buildingimagerecognition.model.BuildingViewModel
 class MainActivity : ComponentActivity() {
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-        ) {
+    ) {
         granted ->
         if (granted) {
             startApp()
 
         }
     }
+
+    private val galleryPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            startApp()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (hasCameraPermission()) {
-            startApp()
+            if (hasGalleryPermission()) {
+                startApp()
+            } else {
+                galleryPermissionLauncher.launch(getGalleryPermission())
+            }
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
@@ -43,5 +57,19 @@ class MainActivity : ComponentActivity() {
             Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
     }
-}
 
+    private fun hasGalleryPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            getGalleryPermission()
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun getGalleryPermission(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+    }
+}

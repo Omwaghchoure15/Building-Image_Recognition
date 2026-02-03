@@ -14,6 +14,7 @@ import com.example.buildingimagerecognition.screen.AddBuildingScreen
 import com.example.buildingimagerecognition.screen.CameraScreen
 import com.example.buildingimagerecognition.screen.HomeScreen
 import com.example.buildingimagerecognition.screen.ResultScreen
+import com.example.buildingimagerecognition.screen.GalleryScreen
 
 @Composable
 fun AppNavHost(
@@ -25,9 +26,15 @@ fun AppNavHost(
     NavHost(navController, startDestination = Screen.Home.route) {
 
         composable(Screen.Home.route) {
-            HomeScreen {
-                navController.navigate(Screen.Camera.create("home"))
-            }
+            HomeScreen(
+                onScanClick = {
+                    cameraSource = CameraSource.SCAN
+                    navController.navigate(Screen.Camera.create("home"))
+                },
+                onGalleryClick = {
+                    navController.navigate(Screen.Gallery.route)
+                }
+            )
         }
         composable(Screen.Camera.route) {
             CameraScreen { bitmap, imagePath ->
@@ -49,6 +56,21 @@ fun AppNavHost(
             }
         }
 
+        composable(Screen.Gallery.route) {
+            GalleryScreen(
+                onImageSelected = { bitmap, imagePath ->
+                    viewModel.setCapturedImage(imagePath)
+                    viewModel.processCapturedImage(bitmap)
+                    navController.navigate(Screen.Result.route) {
+                        popUpTo(Screen.Gallery.route) { inclusive = true }
+                    }
+                },
+                onCancel = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
         composable(Screen.Result.route) {
             ResultScreen(
                 building = viewModel.matchedBuilding,
@@ -64,6 +86,7 @@ fun AppNavHost(
             AddBuildingScreen(
                 viewModel = viewModel,
                 onOpenCamera = {
+                    cameraSource = CameraSource.ADD_BUILDING
                     navController.navigate(Screen.Camera.create("add"))
                 },
                 onSaved = {
