@@ -15,19 +15,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class BuildingViewModel(application: Application): AndroidViewModel(application) {
-
     private val dao: BuildingDao =
         AppDatabase.getDatabase(application).buildingDao()
-
     var capturedImagePath by mutableStateOf<String?>(null)
         private set
-
     var matchedBuilding by mutableStateOf<BuildingEntity?>(null)
         private set
-
     var detectedLabels by mutableStateOf<List<String>>(emptyList())
         private set
-
     fun setCapturedImage(path: String) {
         capturedImagePath = path
     }
@@ -38,28 +33,27 @@ class BuildingViewModel(application: Application): AndroidViewModel(application)
 
             Log.d("ML_LABELS", "Detected labels: $labels")
 
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
+
                 val buildings = dao.getAllBuildings()
 
                 matchedBuilding = buildings.firstOrNull { building ->
-                    val stored = building.labels
-                        .lowercase()
+
+                    val storedLabels = building.labels
                         .split(",")
+                        .map { it.trim().lowercase() }
+                    val detectedSet = labels
+                        .map { it.trim().lowercase() }
+                        .toSet()
 
-                    val detected = labels
-                        .map { it.lowercase() }
-
-                    // loose match for assignment
-                    detected.any { label ->
-                        label.contains("building") ||
-                                label.contains("architecture") ||
-                                label.contains("mall") ||
-                                label.contains("structure")
-                    }
+                    storedLabels
+                        .intersect(detectedSet)
+                        .isNotEmpty()
                 }
             }
         }
     }
+
     fun saveBuildings(
         name: String,
         location: String,

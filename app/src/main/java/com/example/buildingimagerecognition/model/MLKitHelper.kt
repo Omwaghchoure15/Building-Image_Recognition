@@ -6,6 +6,11 @@ import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 
 object MLKitHelper {
+    private val fallbackLabels = listOf(
+        "building",
+        "architecture",
+        "structure"
+    )
 
     fun labelImage(
         bitmap: Bitmap,
@@ -23,14 +28,18 @@ object MLKitHelper {
                     .filter { it.confidence > 0.6f }
                     .map { it.text.trim().lowercase() }
 
-                onResult(result)
+                if (result.isEmpty()) {
+                    onResult(fallbackLabels)
+                } else {
+                    onResult(result)
+                }
             }
-            .addOnFailureListener { e ->
-                e.printStackTrace()
-                onResult(emptyList())
+            .addOnFailureListener {
+                onResult(fallbackLabels)
             }
     }
 }
+
 
 
 
