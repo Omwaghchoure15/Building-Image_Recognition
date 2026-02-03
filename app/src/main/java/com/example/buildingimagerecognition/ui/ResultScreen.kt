@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,10 +26,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.buildingimagerecognition.R
 import com.example.buildingimagerecognition.data.BuildingEntity
+import com.example.buildingimagerecognition.ui.theme.BuildingImageRecognitionTheme
 
 @Composable
 fun ResultScreen(
@@ -40,60 +44,96 @@ fun ResultScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(20.dp)
         ) {
             capturedImagePath?.let {
                 Text(
                     text = "Captured Image",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.secondary
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(12.dp))
 
                 ImageCarousel(imagePaths = listOf(it))
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
             }
 
             if (building != null) {
                 Text(
                     text = "Building Recognized",
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(16.dp))
 
-                Text("Name: ${building.name}")
-                Text("Location: ${building.location}")
+                Text(
+                    text = "Name: ${building.name}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "Location: ${building.location}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
                 if (building.imagePaths.isNotBlank()) {
-
-                    Spacer(Modifier.height(16.dp))
-
-                    Text("Reference Images:")
-
-                    Spacer(Modifier.height(8.dp))
-
+                    Spacer(Modifier.height(24.dp))
+                    Text(
+                        text = "Reference Images",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Spacer(Modifier.height(12.dp))
                     ImageCarousel(imagePaths = building.imagePaths.split(","))
                 }
 
-                Spacer(Modifier.height(16.dp))
-                Text("Detected Labels:")
-                Text(labels.joinToString(", "))
+                Spacer(Modifier.height(24.dp))
+                Text(
+                    text = "Detected Labels",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = labels.joinToString(", "),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
             } else {
                 Text(
                     text = "No Building Match Found",
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
                 )
-
-                Spacer(Modifier.height(8.dp))
-
-                Text("Detected Labels:")
-                Text(labels.joinToString(", "))
 
                 Spacer(Modifier.height(16.dp))
 
-                Button(onClick = onAddBuilding) {
-                    Text("Add Building")
+                Text(
+                    text = "Detected Labels",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = labels.joinToString(", "),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                Button(
+                    onClick = onAddBuilding,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Add This Building", style = MaterialTheme.typography.titleMedium)
                 }
             }
         }
@@ -112,11 +152,7 @@ fun ImageCarousel(imagePaths: List<String>) {
         items(imagePaths) { path ->
             val bitmap = remember(path) {
                 if (isPreview) {
-                    BitmapFactory
-                        .decodeResource(
-                            context.resources,
-                            R.drawable.img1
-                        )
+                    BitmapFactory.decodeResource(context.resources, R.drawable.img1)
                 } else {
                     try {
                         BitmapFactory.decodeFile(path)
@@ -131,8 +167,8 @@ fun ImageCarousel(imagePaths: List<String>) {
                     bitmap = it.asImageBitmap(),
                     contentDescription = "Building image",
                     modifier = Modifier
-                        .size(250.dp)
-                        .clip(RoundedCornerShape(12.dp)),
+                        .size(width = 250.dp, height = 200.dp)
+                        .clip(RoundedCornerShape(18.dp)),
                     contentScale = ContentScale.Crop
                 )
             }
@@ -143,10 +179,17 @@ fun ImageCarousel(imagePaths: List<String>) {
 @Preview(showBackground = true)
 @Composable
 fun ResultScreenPreview() {
-    ResultScreen(
-        building = null,
-        labels = listOf("label1", "label2"),
-        capturedImagePath = R.drawable.img1.toString(),
-        onAddBuilding = {}
-    )
+    BuildingImageRecognitionTheme {
+        ResultScreen(
+            building = BuildingEntity(
+                name = "The Platinum Mall",
+                location = "Cotton Green",
+                labels = "building",
+                imagePaths = ""
+            ),
+            labels = listOf("building"),
+            capturedImagePath = R.drawable.img1.toString(),
+            onAddBuilding = {}
+        )
+    }
 }

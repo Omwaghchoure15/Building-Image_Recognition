@@ -92,6 +92,22 @@ fun HomeScreen(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Create by Om Waghchoure",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Android Developer",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }
