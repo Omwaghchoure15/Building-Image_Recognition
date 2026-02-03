@@ -1,4 +1,4 @@
-package com.example.buildingimagerecognition
+package com.example.buildingimagerecognition.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -10,12 +10,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.buildingimagerecognition.model.AppNavHost
 import com.example.buildingimagerecognition.model.BuildingViewModel
+import com.example.buildingimagerecognition.ui.theme.BuildingImageRecognitionTheme
 
 class MainActivity : ComponentActivity() {
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) {
-        granted ->
+    ) { granted ->
         if (granted) {
             startApp()
         }
@@ -32,8 +32,10 @@ class MainActivity : ComponentActivity() {
 
     private fun startApp() {
         setContent {
-            val buildingViewModel: BuildingViewModel = viewModel()
-            AppNavHost(viewModel = buildingViewModel)
+            BuildingImageRecognitionTheme {
+                val buildingViewModel: BuildingViewModel = viewModel()
+                AppNavHost(viewModel = buildingViewModel)
+            }
         }
     }
 

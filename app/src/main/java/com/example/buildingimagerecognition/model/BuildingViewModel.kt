@@ -26,7 +26,6 @@ class BuildingViewModel(application: Application): AndroidViewModel(application)
     fun setCapturedImage(path: String) {
         capturedImagePath = path
     }
-
     fun processCapturedImage(bitmap: Bitmap) {
         MLKitHelper.labelImage(bitmap) { labels ->
             detectedLabels = labels
@@ -74,6 +73,4 @@ class BuildingViewModel(application: Application): AndroidViewModel(application)
             Log.d("ROOM", "All buildings: $allBuildings")
         }
     }
-
-
 }

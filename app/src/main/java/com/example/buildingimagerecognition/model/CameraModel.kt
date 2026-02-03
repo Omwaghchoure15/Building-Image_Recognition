@@ -24,12 +24,12 @@ object CameraModel {
             "IMG_${System.currentTimeMillis()}.jpg"
         )
 
-        val outputOptions =
-            ImageCapture.OutputFileOptions.Builder(photoFile).build()
+        val outputOptions = ImageCapture
+            .OutputFileOptions
+            .Builder(photoFile)
+            .build()
 
-        capture.takePicture(
-            outputOptions,
-            executor,
+        capture.takePicture(outputOptions, executor,
             object : ImageCapture.OnImageSavedCallback {
 
                 override fun onImageSaved(

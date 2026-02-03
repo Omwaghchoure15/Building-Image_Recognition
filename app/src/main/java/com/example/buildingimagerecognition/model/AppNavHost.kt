@@ -8,10 +8,10 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.buildingimagerecognition.screen.AddBuildingScreen
-import com.example.buildingimagerecognition.screen.CameraScreen
-import com.example.buildingimagerecognition.screen.HomeScreen
-import com.example.buildingimagerecognition.screen.ResultScreen
+import com.example.buildingimagerecognition.ui.AddBuildingScreen
+import com.example.buildingimagerecognition.ui.CameraScreen
+import com.example.buildingimagerecognition.ui.HomeScreen
+import com.example.buildingimagerecognition.ui.ResultScreen
 
 @Composable
 fun AppNavHost(
@@ -20,7 +20,10 @@ fun AppNavHost(
     val navController = rememberNavController()
     var cameraSource by remember { mutableStateOf(CameraSource.SCAN) }
 
-    NavHost(navController, startDestination = Screen.Home.route) {
+    NavHost(
+        navController,
+        startDestination = Screen.Home.route
+    ) {
 
         composable(Screen.Home.route) {
             HomeScreen(

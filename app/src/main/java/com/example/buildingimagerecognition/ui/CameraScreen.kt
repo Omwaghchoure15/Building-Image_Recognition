@@ -1,6 +1,7 @@
-package com.example.buildingimagerecognition.screen
+@file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
 
-import android.content.Context
+package com.example.buildingimagerecognition.ui
+
 import android.graphics.Bitmap
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -19,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -46,7 +46,7 @@ fun CameraScreen(
     onImageCaptured: (Bitmap, String) -> Unit
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val executor = ContextCompat.getMainExecutor(context)
 
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }

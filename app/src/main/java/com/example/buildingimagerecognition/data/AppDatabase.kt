@@ -10,6 +10,7 @@ import androidx.room.RoomDatabase
     version = 2,
     exportSchema = false
 )
+
 abstract class AppDatabase : RoomDatabase() {
     abstract fun buildingDao(): BuildingDao
     companion object {
