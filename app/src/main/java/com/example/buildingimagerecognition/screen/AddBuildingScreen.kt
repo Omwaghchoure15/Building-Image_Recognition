@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,7 +21,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,8 +30,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.buildingimagerecognition.R
 import com.example.buildingimagerecognition.model.BuildingViewModel
 import com.example.buildingimagerecognition.ui.theme.BuildingImageRecognitionTheme
 import kotlinx.coroutines.launch
@@ -41,21 +42,19 @@ import kotlinx.coroutines.launch
 @Preview(showBackground = true)
 @Composable
 fun AddBuildingScreenPreview() {
-    BuildingImageRecognitionTheme {
-        AddBuildingContent(
-            capturedImagePath = "sample/path/image.jpg",
-            onOpenCamera = {},
-            onSaveBuildings = { _, _, _ -> },
-            onSaved = {}
-        )
-    }
+    AddBuildingContent(
+        capturedImagePath = "preview",
+        onOpenCamera = {},
+        onSaveBuildings = { _, _, _ -> },
+        onSaved = {}
+    )
 }
-
 
 @Composable
 fun AddBuildingScreen(
     viewModel: BuildingViewModel,
     onOpenCamera: () -> Unit,
+
     onSaved: () -> Unit
 ) {
     AddBuildingContent(
@@ -64,9 +63,7 @@ fun AddBuildingScreen(
         onSaveBuildings = { name, location, imagePaths ->
 
             val finalLabels =
-                if (viewModel.detectedLabels.isNotEmpty()) {
-                    viewModel.detectedLabels
-                } else {
+                viewModel.detectedLabels.ifEmpty {
                     listOf("building", "architecture", "structure")
                 }
 
@@ -81,8 +78,6 @@ fun AddBuildingScreen(
     )
 }
 
-
-
 @Composable
 fun AddBuildingContent(
     capturedImagePath: String?,
@@ -95,8 +90,12 @@ fun AddBuildingContent(
 
     var name by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
-    val imagePaths = remember { mutableStateListOf<String>() }
     var error by remember { mutableStateOf("") }
+
+    val imagePaths = remember(capturedImagePath) {
+        if (capturedImagePath != null) listOf(capturedImagePath)
+        else emptyList()
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) }
@@ -123,26 +122,29 @@ fun AddBuildingContent(
             Spacer(Modifier.height(12.dp))
 
             Button(
-                onClick = {
-                    if (capturedImagePath != null && imagePaths.isEmpty()) {
-                        imagePaths.add(capturedImagePath)
-                    }
-                }
+                onClick = onOpenCamera
             ) {
-                Button(onClick = onOpenCamera) {
-                    Text("Capture Image (${imagePaths.size}/3)")
-                }
+                Text(
+                    if (capturedImagePath == null)
+                        "Capture Image (0/1)"
+                    else
+                        "Image Capture ✔"
+                )
             }
 
-            CapturedImagePreview(imagePaths)
+            Text(
+                text = if (capturedImagePath != null)
+                    "Image captured ✅"
+                else
+                    "No image captured",
+                color = if (capturedImagePath != null)
+                    MaterialTheme.colorScheme.primary
+                else
+                    Color.Gray
+            )
 
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = onOpenCamera,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Open Camera")
+            if (imagePaths.isNotEmpty()) {
+                CapturedImagePreview(imagePaths)
             }
 
             Spacer(Modifier.height(16.dp))
@@ -152,7 +154,7 @@ fun AddBuildingContent(
                     error = when {
                         name.isBlank() -> "Name required"
                         location.isBlank() -> "Location required"
-                        imagePaths.isEmpty() -> "Capture at least 1 image"
+                        capturedImagePath == null -> "Capture at least 1 image"
                         else -> ""
                     }
 
@@ -162,9 +164,10 @@ fun AddBuildingContent(
                             location,
                             imagePaths
                         )
+
                         scope.launch {
                             snackBarHostState.showSnackbar(
-                                message = "Building saved successfully ✅"
+                                "Building saved successfully ✅"
                             )
                             onSaved()
                         }
@@ -185,29 +188,38 @@ fun AddBuildingContent(
 fun CapturedImagePreview(imagePaths: List<String>) {
     if (imagePaths.isEmpty()) return
 
+    val isPreview = LocalInspectionMode.current
+    val context = LocalContext.current
+
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.padding(vertical = 12.dp)
     ) {
+
         items(imagePaths) { path ->
             val bitmap = remember(path) {
-                try {
-                    BitmapFactory.decodeFile(path)
-                } catch (e: Exception) {
-                    null
-                }
+                runCatching {
+                    if (isPreview) {
+                        BitmapFactory.decodeResource(
+                            context.resources,
+                            R.drawable.img1   // preview placeholder
+                        )
+                    } else {
+                        BitmapFactory.decodeFile(path)
+                    }
+                }.getOrNull()
             }
-            bitmap?.let {
+            if (bitmap != null) {
                 Image(
-                    bitmap = it.asImageBitmap(),
+                    bitmap = bitmap.asImageBitmap(),
                     contentDescription = "Building image",
                     modifier = Modifier
                         .size(120.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(12.dp)
+                            1.dp,
+                            MaterialTheme.colorScheme.outline,
+                            RoundedCornerShape(12.dp)
                         ),
                     contentScale = ContentScale.Crop
                 )

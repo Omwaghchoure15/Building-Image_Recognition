@@ -55,7 +55,6 @@ fun ResultScreen(
                 .padding(16.dp)
         ) {
 
-            // ✅ IMAGE SECTION (always visible)
             val images = when {
                 building != null && building.imagePaths.isNotBlank() ->
                     building.imagePaths.split(",")
@@ -71,9 +70,7 @@ fun ResultScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            // ✅ CONTENT SECTION
             if (building != null) {
-
                 Text(
                     text = "Building Recognized",
                     style = MaterialTheme.typography.headlineMedium
