@@ -11,7 +11,6 @@ import java.io.File
 import java.util.concurrent.Executor
 
 object CameraModel {
-
     fun captureImage(
         context: Context,
         imageCapture: ImageCapture?,
@@ -51,4 +50,3 @@ object CameraModel {
         )
     }
 }
-

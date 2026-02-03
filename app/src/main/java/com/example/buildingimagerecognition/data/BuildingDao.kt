@@ -1,4 +1,4 @@
-package com.example.buildingimagerecognition.model
+package com.example.buildingimagerecognition.data
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -12,7 +12,8 @@ interface BuildingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBuilding(building: BuildingEntity)
 
-    @Query("SELECT * FROM BuildingEntity")
+    @Query("SELECT * FROM buildings")
     suspend fun getAllBuildings(): List<BuildingEntity>
 }
+
 

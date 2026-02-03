@@ -9,13 +9,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.buildingimagerecognition.data.AppDatabase
+import com.example.buildingimagerecognition.data.BuildingDao
 import com.example.buildingimagerecognition.data.BuildingEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class BuildingViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+class BuildingViewModel(application: Application): AndroidViewModel(application) {
 
     private val dao: BuildingDao =
         AppDatabase.getDatabase(application).buildingDao()
@@ -35,26 +34,32 @@ class BuildingViewModel(
 
     fun processCapturedImage(bitmap: Bitmap) {
         MLKitHelper.labelImage(bitmap) { labels ->
+            detectedLabels = labels
 
-            detectedLabels = labels.map { it.trim().lowercase() }
+            Log.d("ML_LABELS", "Detected labels: $labels")
 
             viewModelScope.launch {
                 val buildings = dao.getAllBuildings()
 
                 matchedBuilding = buildings.firstOrNull { building ->
-
-                    val storedLabels = building.labels
+                    val stored = building.labels
+                        .lowercase()
                         .split(",")
-                        .map { it.trim().lowercase() }
 
-                    storedLabels
-                        .intersect(detectedLabels.toSet())
-                        .size >= 2
+                    val detected = labels
+                        .map { it.lowercase() }
+
+                    // loose match for assignment
+                    detected.any { label ->
+                        label.contains("building") ||
+                                label.contains("architecture") ||
+                                label.contains("mall") ||
+                                label.contains("structure")
+                    }
                 }
             }
         }
     }
-
     fun saveBuildings(
         name: String,
         location: String,

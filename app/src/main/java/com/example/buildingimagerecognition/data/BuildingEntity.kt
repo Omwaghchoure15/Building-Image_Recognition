@@ -3,7 +3,7 @@ package com.example.buildingimagerecognition.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "BuildingEntity")
+@Entity(tableName = "buildings")
 data class BuildingEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,

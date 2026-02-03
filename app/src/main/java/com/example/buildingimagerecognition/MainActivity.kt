@@ -12,14 +12,15 @@ import com.example.buildingimagerecognition.model.AppNavHost
 import com.example.buildingimagerecognition.model.BuildingViewModel
 
 class MainActivity : ComponentActivity() {
-    private val cameraPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { granted ->
-            if (granted) {
-                startApp()
-            }
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+        ) {
+        granted ->
+        if (granted) {
+            startApp()
+
         }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (hasCameraPermission()) {

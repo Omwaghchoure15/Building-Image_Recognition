@@ -1,6 +1,10 @@
 package com.example.buildingimagerecognition.model
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,6 +18,7 @@ fun AppNavHost(
     viewModel: BuildingViewModel
 ) {
     val navController = rememberNavController()
+    var cameraSource by remember { mutableStateOf(CameraSource.SCAN) }
 
     NavHost(
         navController = navController,
@@ -22,39 +27,47 @@ fun AppNavHost(
 
         composable(Screen.Home.route) {
             HomeScreen {
+                cameraSource = CameraSource.SCAN
                 navController.navigate(Screen.Camera.route)
             }
         }
 
         composable(Screen.Camera.route) {
-            CameraScreen { bitmap, imagePath ->
+            CameraScreen(
+                cameraSource = cameraSource
+            ) { bitmap, imagePath ->
 
-                viewModel.setCapturedImage(imagePath)
-                viewModel.processCapturedImage(bitmap)
-
-                navController.navigate(Screen.Result.route)
+                if (cameraSource == CameraSource.SCAN) {
+                    navController.navigate(Screen.Result.route)
+                } else {
+                    navController.popBackStack()
+                }
             }
         }
+
 
         composable(Screen.Result.route) {
             ResultScreen(
                 building = viewModel.matchedBuilding,
                 labels = viewModel.detectedLabels,
+                capturedImagePath = viewModel.capturedImagePath,
                 onAddBuilding = {
+                    cameraSource = CameraSource.ADD_BUILDING
                     navController.navigate(Screen.AddBuilding.route)
                 }
             )
         }
 
         composable(Screen.AddBuilding.route) {
-
             AddBuildingScreen(
                 viewModel = viewModel,
+                onOpenCamera = {
+                    cameraSource = CameraSource.ADD_BUILDING
+                    navController.navigate(Screen.Camera.route)
+                },
                 onSaved = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Home.route) {
-                            inclusive = true
-                        }
+                        popUpTo(Screen.Home.route) { inclusive = true }
                     }
                 }
             )

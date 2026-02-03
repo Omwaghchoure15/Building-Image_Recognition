@@ -1,6 +1,5 @@
 package com.example.buildingimagerecognition.screen
 
-import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import com.example.buildingimagerecognition.R
 import androidx.compose.foundation.Image
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -36,6 +36,7 @@ fun ResultScreenPreview() {
     ResultScreen(
         building = null,
         labels = listOf("label1", "label2"),
+        capturedImagePath = null,
         onAddBuilding = {},
     )
 }
@@ -44,6 +45,7 @@ fun ResultScreenPreview() {
 fun ResultScreen(
     building: BuildingEntity?,
     labels: List<String>,
+    capturedImagePath: String?,
     onAddBuilding: () -> Unit
 ) {
     Scaffold { padding ->
@@ -53,15 +55,27 @@ fun ResultScreen(
                 .padding(16.dp)
         ) {
 
+            // ✅ IMAGE SECTION (always visible)
+            val images = when {
+                building != null && building.imagePaths.isNotBlank() ->
+                    building.imagePaths.split(",")
+
+                capturedImagePath != null ->
+                    listOf(capturedImagePath)
+
+                else -> emptyList()
+            }
+
+            if (images.isNotEmpty()) {
+                ImageCarousel(imagePaths = images)
+                Spacer(Modifier.height(16.dp))
+            }
+
+            // ✅ CONTENT SECTION
             if (building != null) {
 
-                val images = getImageItems(building)
-                ImageCarousel(images)
-
-                Spacer(Modifier.height(16.dp))
-
                 Text(
-                    "Building Recognized",
+                    text = "Building Recognized",
                     style = MaterialTheme.typography.headlineMedium
                 )
 
@@ -78,7 +92,7 @@ fun ResultScreen(
             } else {
 
                 Text(
-                    "No Building Match Found",
+                    text = "No Building Match Found",
                     style = MaterialTheme.typography.headlineMedium
                 )
 
@@ -98,26 +112,26 @@ fun ResultScreen(
 }
 
 @Composable
-fun ImageCarousel(images: List<Any>) {
+fun ImageCarousel(imagePaths: List<String>) {
     val context = LocalContext.current
 
     LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(220.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(images) { item ->
+        items(imagePaths) { path ->
 
-            val bitmap = remember(item) {
+            val bitmap = remember(path) {
                 try {
-                    when (item) {
-                        is Int -> BitmapFactory.decodeResource(
-                            context.resources,
-                            item
+                    if (path.startsWith("drawable:")) {
+                        val resName = path.removePrefix("drawable:")
+                        val resId = context.resources.getIdentifier(
+                            resName,
+                            "drawable",
+                            context.packageName
                         )
-                        is String -> BitmapFactory.decodeFile(item)
-                        else -> null
+                        BitmapFactory.decodeResource(context.resources, resId)
+                    } else {
+                        BitmapFactory.decodeFile(path)
                     }
                 } catch (e: Exception) {
                     null
@@ -127,10 +141,9 @@ fun ImageCarousel(images: List<Any>) {
             bitmap?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
-                    contentDescription = null,
+                    contentDescription = "Building image",
                     modifier = Modifier
-                        .fillParentMaxHeight()
-                        .width(300.dp)
+                        .size(200.dp)
                         .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop
                 )
@@ -139,17 +152,13 @@ fun ImageCarousel(images: List<Any>) {
     }
 }
 
-@Composable
-private fun getImageItems(building: BuildingEntity?): List<Any> {
+private fun getImageItems(building: BuildingEntity?): List<String> {
     return if (building == null || building.imagePaths.isBlank()) {
         listOf(
-            R.drawable.img1,
-            R.drawable.img2,
+            "drawable:img1",
+            "drawable:img2"
         )
     } else {
         building.imagePaths.split(",")
     }
 }
-
-
-
