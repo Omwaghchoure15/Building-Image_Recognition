@@ -8,10 +8,11 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.buildingimagerecognition.ui.AddBuildingScreen
-import com.example.buildingimagerecognition.ui.CameraScreen
-import com.example.buildingimagerecognition.ui.HomeScreen
-import com.example.buildingimagerecognition.ui.ResultScreen
+import com.example.buildingimagerecognition.ui.screen.AddBuildingScreen
+import com.example.buildingimagerecognition.ui.screen.BuildingListScreen
+import com.example.buildingimagerecognition.ui.screen.CameraScreen
+import com.example.buildingimagerecognition.ui.screen.HomeScreen
+import com.example.buildingimagerecognition.ui.screen.ResultScreen
 
 @Composable
 fun AppNavHost(
@@ -31,22 +32,34 @@ fun AppNavHost(
                     cameraSource = CameraSource.SCAN
                     navController.navigate(Screen.Camera.create("home"))
                 },
+                onViewListClick = {
+                    navController.navigate("building_list")
+                }
             )
         }
+
+        composable("building_list") {
+            BuildingListScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
         composable(Screen.Camera.route) {
             CameraScreen { bitmap, imagePath ->
 
-                viewModel.setCapturedImage(imagePath)
-                viewModel.processCapturedImage(bitmap)
-
                 when (cameraSource) {
                     CameraSource.SCAN -> {
+                        viewModel.setCapturedImage(imagePath)
+                        viewModel.processCapturedImage(bitmap)
                         navController.navigate(Screen.Result.route) {
                             popUpTo(Screen.Camera.route) { inclusive = true }
                         }
                     }
 
                     CameraSource.ADD_BUILDING -> {
+                        viewModel.addCapturedImage(imagePath)
+                        viewModel.processCapturedImage(bitmap)
                         navController.popBackStack()
                     }
                 }
@@ -59,6 +72,8 @@ fun AppNavHost(
                 labels = viewModel.detectedLabels,
                 capturedImagePath = viewModel.capturedImagePath,
                 onAddBuilding = {
+                    // Pre-populate with the image that was just scanned
+                    viewModel.capturedImagePath?.let { viewModel.addCapturedImage(it) }
                     navController.navigate(Screen.AddBuilding.route)
                 }
             )

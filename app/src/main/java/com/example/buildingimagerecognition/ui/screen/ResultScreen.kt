@@ -1,4 +1,4 @@
-package com.example.buildingimagerecognition.ui
+package com.example.buildingimagerecognition.ui.screen
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
@@ -32,7 +32,25 @@ import androidx.compose.ui.unit.dp
 import com.example.buildingimagerecognition.R
 import com.example.buildingimagerecognition.data.BuildingEntity
 import com.example.buildingimagerecognition.ui.theme.BuildingImageRecognitionTheme
+import com.example.buildingimagerecognition.util.ImageUtils
 
+@Preview(showBackground = true)
+@Composable
+fun ResultScreenPreview() {
+    BuildingImageRecognitionTheme {
+        ResultScreen(
+            building = BuildingEntity(
+                name = "Nutan 32 Number",
+                location = "Abhyuday nager Kalachowki",
+                labels = "building",
+                imagePaths = ""
+            ),
+            labels = listOf("building"),
+            capturedImagePath = R.drawable.img1.toString(),
+            onAddBuilding = {}
+        )
+    }
+}
 @Composable
 fun ResultScreen(
     building: BuildingEntity?,
@@ -154,11 +172,7 @@ fun ImageCarousel(imagePaths: List<String>) {
                 if (isPreview) {
                     BitmapFactory.decodeResource(context.resources, R.drawable.img1)
                 } else {
-                    try {
-                        BitmapFactory.decodeFile(path)
-                    } catch (_: Exception) {
-                        null
-                    }
+                    ImageUtils.decodeAndRotateImage(path)
                 }
             }
 
@@ -173,23 +187,5 @@ fun ImageCarousel(imagePaths: List<String>) {
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ResultScreenPreview() {
-    BuildingImageRecognitionTheme {
-        ResultScreen(
-            building = BuildingEntity(
-                name = "The Platinum Mall",
-                location = "Cotton Green",
-                labels = "building",
-                imagePaths = ""
-            ),
-            labels = listOf("building"),
-            capturedImagePath = R.drawable.img1.toString(),
-            onAddBuilding = {}
-        )
     }
 }

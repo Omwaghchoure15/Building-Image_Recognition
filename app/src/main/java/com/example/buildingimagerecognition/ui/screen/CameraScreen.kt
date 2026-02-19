@@ -1,6 +1,6 @@
 @file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
 
-package com.example.buildingimagerecognition.ui
+package com.example.buildingimagerecognition.ui.screen
 
 import android.graphics.Bitmap
 import androidx.camera.core.*

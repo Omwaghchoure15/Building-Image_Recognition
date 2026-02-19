@@ -1,6 +1,7 @@
 package com.example.buildingimagerecognition.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -12,6 +13,10 @@ interface BuildingDao {
 
     @Query("SELECT * FROM buildings")
     suspend fun getAllBuildings(): List<BuildingEntity>
+
+    @Query("DELETE FROM buildings")
+    suspend fun deleteAllBuildings()
+
+    @Delete
+    suspend fun deleteBuilding(building: BuildingEntity)
 }
-
-

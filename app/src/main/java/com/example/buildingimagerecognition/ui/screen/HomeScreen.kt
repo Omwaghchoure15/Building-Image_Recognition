@@ -1,4 +1,4 @@
-package com.example.buildingimagerecognition.ui
+package com.example.buildingimagerecognition.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -9,10 +9,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +34,8 @@ import com.example.buildingimagerecognition.ui.theme.BuildingImageRecognitionThe
 
 @Composable
 fun HomeScreen(
-    onScanClick: () -> Unit
+    onScanClick: () -> Unit,
+    onViewListClick: () -> Unit
 ) {
     Scaffold { padding ->
         Column(
@@ -85,6 +91,23 @@ fun HomeScreen(
                 )
             }
             
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = onViewListClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.List, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "View Stored Buildings",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
@@ -117,7 +140,8 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     BuildingImageRecognitionTheme {
         HomeScreen(
-            onScanClick = {}
+            onScanClick = {},
+            onViewListClick = {}
         )
     }
 }

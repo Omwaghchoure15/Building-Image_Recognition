@@ -20,14 +20,15 @@ class MainActivity : ComponentActivity() {
             startApp()
         }
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (hasCameraPermission()) {
             startApp()
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
+
     }
 
     private fun startApp() {
